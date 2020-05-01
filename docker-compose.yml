@@ -1,0 +1,70 @@
+version: '2'
+
+services:
+  devenv:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./conf:/conf
+      - ./conf/default.conf:/etc/nginx/conf.d/default.conf
+      - "${DEVENV_WEB_PATH}:/var/www"
+    labels:
+      - "traefik.enable=false"
+    restart: always
+    networks:
+      - devenv
+
+
+  traefik:
+    image: traefik
+    command: 
+      #- "--log.level=DEBUG"
+      - "--api.insecure=true" 
+      - "--entryPoints.web.address=:80"
+      - "--providers.docker=true"
+      - "--providers.docker.defaultRule=Host(`{{ or .Labels.Subdomain .Name }}.dev.env`)"
+    ports:
+      # The Web UI (enabled by --api.insecure=true)
+      - "81:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./conf:/conf
+    labels:
+      - "Subdomain=traefik"
+      - "traefik.http.routers.api.service=api@internal"      
+    restart: always
+    networks:
+      - devenv
+
+
+  whoami:
+    image: containous/whoami
+    labels:
+      - "Subdomain=whoami"
+    restart: always
+    networks:
+      - devenv
+
+
+  dnsmasq:
+    image: dnsmasq
+    build: dnsmasq/
+    ports: 
+      - "127.0.0.1:53:53/udp"
+    volumes:
+      - ./dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+    cap_add:
+      - NET_ADMIN
+    labels:
+      - "traefik.enable=false"
+    restart: always
+    networks:
+      - devenv
+
+
+networks: 
+  devenv:
+    external: true
