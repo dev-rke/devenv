@@ -1,17 +1,19 @@
 version: '2'
 
 services:
-  devenv:
+  static:
     image: nginx:alpine
-    ports:
-      - "80:80"
-      - "443:443"
     volumes:
       - ./conf:/conf
       - ./conf/default.conf:/etc/nginx/conf.d/default.conf
       - "${DEVENV_WEB_PATH}:/var/www"
     labels:
-      - "traefik.enable=false"
+      - "traefik.http.routers.static-devenv-http.rule=HostRegexp(`{subdomain:[a-z0-9]+}.dev.env`)"
+      - "traefik.http.routers.static-devenv-http.priority=5"
+      - "traefik.http.routers.static-devenv-http.tls=false"
+      - "traefik.http.routers.static-devenv-https.rule=HostRegexp(`{subdomain:[a-z0-9]+}.dev.env`)"
+      - "traefik.http.routers.static-devenv-https.priority=5"
+      - "traefik.http.routers.static-devenv-https.tls=true"
     restart: always
     networks:
       - devenv
@@ -21,20 +23,26 @@ services:
     image: traefik
     command: 
       #- "--log.level=DEBUG"
-      - "--api.insecure=true" 
+      - "--api=true"
       - "--entryPoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
       - "--providers.docker=true"
       - "--providers.docker.defaultRule=Host(`{{ or .Labels.Subdomain .Name }}.dev.env`)"
+      - "--providers.file.filename=/conf/dynamic.toml"
+      - "--providers.file.watch=true"
     ports:
-      # The Web UI (enabled by --api.insecure=true)
-      - "81:8080"
+      - "80:80"
+      - "443:443"
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./conf:/conf
     labels:
       - "Subdomain=traefik"
-      - "traefik.http.routers.api.service=api@internal"      
+      - "traefik.http.routers.api-devenv-http.service=api@internal"
+      - "traefik.http.routers.api-devenv-http.tls=false"
+      - "traefik.http.routers.api-devenv-https.service=api@internal"
+      - "traefik.http.routers.api-devenv-https.tls=true"
     restart: always
     networks:
       - devenv
@@ -44,6 +52,8 @@ services:
     image: containous/whoami
     labels:
       - "Subdomain=whoami"
+      - "traefik.http.routers.whoami-devenv-http.tls=false"
+      - "traefik.http.routers.whoami-devenv-https.tls=true"
     restart: always
     networks:
       - devenv
