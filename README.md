@@ -74,7 +74,7 @@ To solve this you have two options:
 
 Technically you need a container providing a HTTP web server on port 80.
 Please do not expose webserver ports (80, 443) to your host, as these are already used by DevEnv.
-The container providing the webserver has to be within the ```devenv``` network and needs a ```Subdomain```-Label.
+The container providing the webserver has to be within the ```devenv``` network and needs a ```Subdomains```-Label.
 
 In this example we use nginx, a simple and lightweight webserver.
 Create a new folder "nginx" and create a ```docker-compose.yml``` with the following contents:
@@ -84,7 +84,7 @@ services:
   web:
     image: nginx:alpine
     label:
-      - "Subdomain=my-server"
+      - "Subdomains=my-server"
     networks:
       - devenv
 
@@ -108,10 +108,35 @@ If you need both HTTP and HTTPS, please use these labels:
 To apply these settings, just do a ```docker-compose down -v``` to stop your container 
 and ```docker-compose up -d``` to run it again.
 A good non-conflicting naming schema for a router is ```<container name>-<project name>-<scheme>```.
+All subdomains defined via ```Subdomains``` property apply to all rules. 
 
 These labels follow the standard docker configuration settings of the 
 reverse proxy [traefik](https://containo.us/traefik/).
 
+#### Multiple subdomains for a single container
+
+If your container needs multiple subdomains, there are two approaches.
+The first and simple approach is to expand the ```Subdomains``` label with comma separated subdomains:
+```yaml
+- "Subdomains=nginx,webserver,myproject"
+```
+This will make your container available under these domains:
+* http://nginx.dev.env
+* http://webserver.dev.env
+* http://myproject.dev.env
+
+Whitespaces before or after the comma will break the behaviour!
+
+The second approach is based on regular traefik configuration, just register your domains as regular rules via label:
+```yaml
+ - "traefik.http.routers.nginx-http.rule=Host(`nginx.dev.env`, `webserver.dev.env`, `myproject.dev.env`)"
+```
+or in a more complex scenario, which allows to define more settings per rule:
+```yaml
+ - "traefik.http.routers.nginx-http.rule=Host(`nginx.dev.env`)"
+ - "traefik.http.routers.webserver-http.rule=Host(`webserver.dev.env`)"
+ - "traefik.http.routers.myproject-http.rule=Host(`myproject.dev.env`)"
+```
 
 ## Deliver static files
 
@@ -150,7 +175,7 @@ on your loop back device 127.0.0.1, which itself will resolve any subdomain of `
 device as well. Therefore a browser will do it's HTTP request to ```127.0.0.1:80``` and HTTPS to ```127.0.0.1:443```.
 
 The processing of the final request travels through traefik. If there exists a route with a container (by defining the
-```Subdomain``` label or other standard traefik labels) it will use this route to finish the request.
+```Subdomains``` label or other standard traefik labels) it will use this route to finish the request.
 If no route is specified, the request falls back to the static nginx service of DevEnv, 
 which will deliver static files from your configured web folder, see .env file for the configured path. 
 The web folder on your host is different on all operating systems.
