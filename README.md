@@ -175,7 +175,8 @@ on your loop back device 127.0.0.1, which itself will resolve any subdomain of `
 device as well. Therefore a browser will do it's HTTP request to ```127.0.0.1:80``` and HTTPS to ```127.0.0.1:443```.
 
 The processing of the final request travels through traefik. If there exists a route with a container (by defining the
-```Subdomains``` label or other standard traefik labels) it will use this route to finish the request.
+```Subdomains``` label or using ```traefik.enable=true``` in combination with other standard traefik labels) 
+it will use this route to finish the request.
 If no route is specified, the request falls back to the static nginx service of DevEnv, 
 which will deliver static files from your configured web folder, see .env file for the configured path. 
 The web folder on your host is different on all operating systems.
