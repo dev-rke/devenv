@@ -50,17 +50,6 @@ services:
       - devenv
 
 
-  whoami:
-    image: containous/whoami
-    labels:
-      - "devenv.subdomains=whoami"
-      - "traefik.http.routers.whoami-devenv-http.tls=false"
-      - "traefik.http.routers.whoami-devenv-https.tls=true"
-    restart: always
-    networks:
-      - devenv
-
-
   dnsmasq:
     image: dnsmasq
     build: dnsmasq/
@@ -73,6 +62,17 @@ services:
     restart: always
     networks:
       - devenv
+
+
+#  whoami:
+#    image: containous/whoami
+#    labels:
+#      - "devenv.subdomains=whoami"
+#      - "traefik.http.routers.whoami-devenv-http.tls=false"
+#      - "traefik.http.routers.whoami-devenv-https.tls=true"
+#    restart: always
+#    networks:
+#      - devenv
 
 
 networks: 
