@@ -28,8 +28,8 @@ services:
       - "--entryPoints.web.address=:80"
       - "--entryPoints.websecure.address=:443"
       - "--providers.docker=true"
-      - "--providers.docker.contraints=LabelRegex(`Subdomains`,`.+`) || Label(`traefik.enable`,`true`)"
-      - "--providers.docker.defaultRule=Host(`{{ replace \",\" \".dev.env`,`\" (or .Labels.Subdomains .Name) }}.dev.env`)"
+      - "--providers.docker.constraints=LabelRegex(`devenv.subdomains`,`.+`) || Label(`traefik.enable`,`true`)"
+      - "--providers.docker.defaultRule=Host(`{{ replace \",\" \".dev.env`,`\" (or (index .Labels \"devenv.subdomains\") .Name) }}.dev.env`)"
       - "--providers.file.filename=/conf/dynamic.toml"
       - "--providers.file.watch=true"
     ports:
@@ -40,7 +40,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./conf:/conf
     labels:
-      - "Subdomains=traefik"
+      - "devenv.subdomains=traefik"
       - "traefik.http.routers.api-devenv-http.service=api@internal"
       - "traefik.http.routers.api-devenv-http.tls=false"
       - "traefik.http.routers.api-devenv-https.service=api@internal"
@@ -53,7 +53,7 @@ services:
   whoami:
     image: containous/whoami
     labels:
-      - "Subdomains=whoami"
+      - "devenv.subdomains=whoami"
       - "traefik.http.routers.whoami-devenv-http.tls=false"
       - "traefik.http.routers.whoami-devenv-https.tls=true"
     restart: always
