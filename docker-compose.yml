@@ -32,6 +32,7 @@ services:
       - "--providers.docker.defaultRule=Host(`{{ replace \",\" \".dev.env`,`\" (or (index .Labels \"devenv.subdomains\") .Name) }}.dev.env`)"
       - "--providers.file.filename=/conf/dynamic.toml"
       - "--providers.file.watch=true"
+      - "--serversTransport.forwardingTimeouts.dialTimeout=240s"
     ports:
       - "80:80"
       - "443:443"
