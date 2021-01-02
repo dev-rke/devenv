@@ -30,6 +30,7 @@ services:
       - "--providers.docker=true"
       - "--providers.docker.constraints=LabelRegex(`devenv.subdomains`,`.+`) || Label(`traefik.enable`,`true`)"
       - "--providers.docker.defaultRule=Host(`{{ replace \",\" \".dev.env`,`\" (or (index .Labels \"devenv.subdomains\") .Name) }}.dev.env`)"
+      - "--providers.docker.network=devenv"
       - "--providers.file.filename=/conf/dynamic.toml"
       - "--providers.file.watch=true"
       - "--serversTransport.forwardingTimeouts.dialTimeout=240s"
