@@ -10,7 +10,7 @@ Move-Item -Force -Path .\*.pem -Destination .\conf/
 Add-DnsClientNrptRule -Namespace "dev.env" -NameServers "127.0.0.1"
 
 # set custom environment variables
-Set-Content -Path .\.env -Value "DEVENV_WEB_PATH=$env:UserProfile/www"
+Set-Content -Path .\.env -Value "DEVENV_WEB_PATH=$env:UserProfile\\www"
 
 # create shared docker network
 docker network create devenv

@@ -83,7 +83,7 @@ version: '2'
 services:
   web:
     image: nginx:alpine
-    label:
+    labels:
       - "devenv.subdomains=my-server"
     networks:
       - devenv
