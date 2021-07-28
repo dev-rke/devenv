@@ -4,7 +4,7 @@
 brew install mkcert
 brew install nss
 mkcert -install
-mkcert "*.dev.env"
+mkcert "*.dev.env" "dev.env"
 mv ./*.pem ./conf/
 
 # register domain resolution in local systemd DNS configuration

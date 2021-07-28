@@ -5,7 +5,7 @@ sudo apt install -y libnss3-tools
 wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-linux-amd64 -O mkcert
 chmod +x ./mkcert
 ./mkcert -install
-./mkcert "*.dev.env"
+./mkcert "*.dev.env" "dev.env"
 mv ./*.pem ./conf/
 
 # register domain resolution in local systemd DNS configuration

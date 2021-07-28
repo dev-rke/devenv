@@ -19,8 +19,10 @@ in some cases, because their development environment differs too hard from stagi
 ## Quickstart
 
 To get it running, clone the repo and run the installer for your operating system.
-When everything was set up successfully, you should be able to see the dashboard when
-you open https://traefik.dev.env/ in your browser.
+When everything was set up successfully, you should be able to see all running stacks when
+you open https://dev.env/ in your browser. Furthermore you are able to see the traefik dashboard 
+via https://traefik.dev.env/
+
 Firefox users on Windows please see the note below in the install section.
 
 

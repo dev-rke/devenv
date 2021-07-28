@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            font-family: helvetica, arial, serif;
+            background-color: lightgray;
+        }
+
+        article {
+            min-width: 350px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        h1, h3 {
+            margin-top: 50px;
+        }
+
+        table {
+            width: 100%;
+            text-align: left;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+            background-color: white;
+            border-collapse: collapse;
+        }
+
+        th {
+            padding: 8px;
+            color: black;
+            border-bottom: 3px solid rgba(0, 0, 0, 0.12);
+        }
+
+        td {
+            border-top: 1px solid rgba(0, 0, 0, 0.12);
+            padding: 8px;
+            border-spacing: 0 0;
+        }
+
+        .environment {
+            list-style-type: none;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .service {
+            font-weight: normal;
+            margin: 10px 0;
+            color: blue;
+        }
+
+        .domain {
+            color: green;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<article>
+    <h1>DevEnv</h1>
+
+    <p>The following local development environments are currently online:</p>
+
+    <div id="environments"></div>
+</article>
+
+<script>
+    (async () => {
+        async function fetchData(url) {
+            const response = (await fetch(url));
+            return await response.json();
+        }
+
+        function process(data) {
+            const map = {};
+            data.forEach((item) => {
+                if (!item || item.rule.match(/HostRegexp/)) {
+                    return;
+                }
+
+                let [service, env] = item.name.split('-').slice(0, -1);
+                env = env || 'global';
+                if (!map[env]) {
+                    map[env] = {};
+                }
+                if (!map[env][service]) {
+                    map[env][service] = {};
+                }
+                const urls = item.rule.replace(/Host\((.*)\)/, '$1').replace(/`/g, '').split(',');
+                urls.forEach((url) => {
+                    const urlKey = url.replace('.dev.env', '');
+                    if (!map[env][service][urlKey]) {
+                        map[env][service][urlKey] = [];
+                    }
+                    map[env][service][urlKey].push(`<a href="http${item.tls ? 's' : ''}://${url}">${item.tls ? '🔒' : '🔓'}</a>`);
+                });
+            });
+            return map;
+        }
+
+        function renderList(map) {
+            return Object.entries(map).map(([environment, environments]) => {
+                const services = Object.entries(environments).map(([service, services]) => {
+                    const urls = Object.entries(services)
+                        .map(([domain, urls]) => `<li class="domain">${domain} ${urls.join(' ')}</li>`);
+                    return `<li class="service">${service} <ul>${urls.join('')}</ul></li>`;
+                });
+                return `<li class="environment">${environment} <ul>${services.join('')}</ul></li>`;
+            }).join('');
+        }
+
+        function renderTable(map) {
+            const result = Object.entries(map).map(([environment, environments]) => {
+                const services = Object.entries(environments).map(([service, services]) => {
+                    const domains = Object.entries(services).map(([domain, urls]) => `${domain} ${urls.join(' ')}`);
+                    return `<td class="service">${service}</td><td class="domain">${domains.join('<br />')}</td>`;
+                });
+                const otherRows = services.slice(1).map((item) => `<tr>${item}</tr>`).join('');
+
+                return `<tr><td class="environment" rowspan="${services.length}">${environment}</td>${services.shift()}</tr>${otherRows}`;
+            });
+
+            const thead = '<thead><th>Environments</th><th>Services</th><th>Subdomains</th></thead>';
+            const tbody = `<tbody>${result.join('')}</tbody>`;
+            return `<table>${thead}${tbody}</table>`;
+        }
+
+        async function run() {
+            const environments = document.getElementById('environments');
+            try {
+                const data = await fetchData('https://traefik.dev.env/api/http/routers');
+                const processed = process(data);
+                const rendered = renderTable(processed);
+                environments.innerHTML = rendered;
+            } catch (e) {
+                environments.innerHTML = 'An error occurred.';
+            }
+        }
+
+        setInterval(run, 10 * 1000);
+        run();
+    })();
+</script>
+</body>
+
+</html>

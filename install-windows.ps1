@@ -2,7 +2,7 @@
 # generate and install certificate
 wget https://github.com/FiloSottile/mkcert/releases/download/v1.4.1/mkcert-v1.4.1-windows-amd64.exe -O mkcert.exe
 .\mkcert.exe -install
-.\mkcert.exe "*.dev.env"
+.\mkcert.exe "*.dev.env" "dev.env"
 Move-Item -Force -Path .\*.pem -Destination .\conf/
 
 # register domain resolution using a local NRTP rule configuration

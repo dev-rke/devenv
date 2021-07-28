@@ -1,5 +1,5 @@
 [tls.stores]
   [tls.stores.default]
     [tls.stores.default.defaultCertificate]
-      certFile = "/conf/_wildcard.dev.env.pem"
-      keyFile = "/conf/_wildcard.dev.env-key.pem"
+      certFile = "/conf/_wildcard.dev.env+1.pem"
+      keyFile = "/conf/_wildcard.dev.env+1-key.pem"
