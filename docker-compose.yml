@@ -10,7 +10,7 @@ services:
       - "${DEVENV_WEB_PATH}:/var/www"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.static-devenv-http.rule=HostRegexp(`{subdomain:[a-z0-9]+}.dev.env`)"
+      - "traefik.http.routers.static-devenv-http.rule=HostRegexp(`{subdomain:[a-z0-9]+}.dev.env`, `dev.env`)"
       - "traefik.http.routers.static-devenv-http.priority=5"
       - "traefik.http.routers.static-devenv-http.tls=false"
       - "traefik.http.routers.static-devenv-https.rule=HostRegexp(`{subdomain:[a-z0-9]+}.dev.env`, `dev.env`)"
@@ -46,10 +46,12 @@ services:
       - "devenv.subdomains=traefik"
       - "traefik.http.routers.traefik-devenv-http.service=api@internal"
       - "traefik.http.routers.traefik-devenv-http.tls=false"
+      - "traefik.http.routers.traefik-devenv-http.middlewares=api-http"
       - "traefik.http.routers.traefik-devenv-https.service=api@internal"
       - "traefik.http.routers.traefik-devenv-https.tls=true"
-      - "traefik.http.routers.traefik-devenv-https.middlewares=api"
-      - "traefik.http.middlewares.api.headers.customresponseheaders.Access-Control-Allow-Origin=https://dev.env"
+      - "traefik.http.routers.traefik-devenv-https.middlewares=api-https"
+      - "traefik.http.middlewares.api-http.headers.customresponseheaders.Access-Control-Allow-Origin=http://dev.env"
+      - "traefik.http.middlewares.api-https.headers.customresponseheaders.Access-Control-Allow-Origin=https://dev.env"
     restart: always
     networks:
       - devenv

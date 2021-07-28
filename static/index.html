@@ -132,7 +132,7 @@
         async function run() {
             const environments = document.getElementById('environments');
             try {
-                const data = await fetchData('https://traefik.dev.env/api/http/routers');
+                const data = await fetchData('//traefik.dev.env/api/http/routers');
                 const processed = process(data);
                 const rendered = renderTable(processed);
                 environments.innerHTML = rendered;
