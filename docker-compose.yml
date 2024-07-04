@@ -10,10 +10,10 @@ services:
       - "${DEVENV_WEB_PATH}:/var/www"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.static-devenv-http.rule=HostRegexp(`{subdomain:[a-z0-9]+}.dev.env`, `dev.env`)"
+      - "traefik.http.routers.static-devenv-http.rule=HostRegexp(`{subdomain:[a-z0-9]+}.dev.env`) || Host(`dev.env`)"
       - "traefik.http.routers.static-devenv-http.priority=5"
       - "traefik.http.routers.static-devenv-http.tls=false"
-      - "traefik.http.routers.static-devenv-https.rule=HostRegexp(`{subdomain:[a-z0-9]+}.dev.env`, `dev.env`)"
+      - "traefik.http.routers.static-devenv-https.rule=HostRegexp(`{subdomain:[a-z0-9]+}.dev.env`) || Host(`dev.env`)"
       - "traefik.http.routers.static-devenv-https.priority=5"
       - "traefik.http.routers.static-devenv-https.tls=true"
     restart: always
