@@ -90,7 +90,7 @@
                 if (!map[env][service]) {
                     map[env][service] = {};
                 }
-                const urls = item.rule.replace(/Host\((.*)\)/, '$1').replace(/`/g, '').split(',');
+                const urls = item.rule.replace(/Host\(\`(.*?)\`\)/g, '$1').replace(/\|/g, '').split(/\s+/);
                 urls.forEach((url) => {
                     const urlKey = url.replace('.dev.env', '');
                     if (!map[env][service][urlKey]) {
