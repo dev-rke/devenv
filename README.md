@@ -30,7 +30,7 @@ Firefox users on Windows please see the note below in the install section.
 
 #### Linux
 
-Requirements: git, docker, docker-compose, systemd
+Requirements: git, docker, docker compose, systemd
 ```bash
 git clone git@github.com:dev-rke/devenv.git
 cd devenv/
@@ -39,7 +39,7 @@ cd devenv/
 
 #### MacOS
 
-Requirements: git, docker, docker-compose, brew
+Requirements: git, docker, docker compose, brew
 ```bash
 git clone git@github.com:dev-rke/devenv.git
 cd devenv/
@@ -48,7 +48,7 @@ cd devenv/
 
 #### Windows
 
-Requirements: git, docker, docker-compose
+Requirements: git, docker, docker compose
 Run in powershell with admin rights:
 ```powershell
 git clone git@github.com:dev-rke/devenv.git
@@ -79,9 +79,8 @@ Please do not expose webserver ports (80, 443) to your host, as these are alread
 The container providing the webserver has to be within the ```devenv``` network and needs a ```devenv.subdomains```-Label.
 
 In this example we use nginx, a simple and lightweight webserver.
-Create a new folder "nginx" and create a ```docker-compose.yml``` with the following contents:
+Create a new folder "nginx" and create a ```compose.yaml``` with the following contents:
 ```yaml
-version: '2'
 services:
   web:
     image: nginx:alpine
@@ -95,7 +94,7 @@ networks:
     external: true
 ```
 
-After running ```docker-compose up -d``` your new container is available via HTTP only: http://my-server.dev.env
+After running ```docker compose up -d``` your new container is available via HTTP only: http://my-server.dev.env
 
 To get it running only via HTTPS, you have to add the following label:
 ```yaml
@@ -107,8 +106,8 @@ If you need both HTTP and HTTPS, please use these labels:
 - "traefik.http.routers.web-nginx-http.tls=false"
 - "traefik.http.routers.web-nginx-https.tls=true"
 ``` 
-To apply these settings, just do a ```docker-compose down -v``` to stop your container 
-and ```docker-compose up -d``` to run it again.
+To apply these settings, just do a ```docker compose down -v``` to stop your container 
+and ```docker compose up -d``` to run it again.
 A good non-conflicting naming schema for a router is ```<container name>-<project name>-<scheme>```.
 All subdomains defined via ```devenv.subdomains``` label apply to all rules. 
 
@@ -167,7 +166,7 @@ The project is a collage of multiple projects:
 The setup process downloads mkcert, generates and registers a CA and generates local certificates for *.dev.env. 
 Then a local resolver is registered in your operating system to resolve any request via dnsmasq. 
 Afterwards a global docker network will be set up to communicate between the containers. 
-At the end docker-compose is booting up DevEnv to serve.
+At the end docker compose is booting up DevEnv to serve.
 
 #### Request processing
 Before a request gets processed, your browser, curl or whatever will resolve it's domain name.

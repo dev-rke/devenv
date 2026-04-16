@@ -16,4 +16,4 @@ Set-Content -Path .\.env -Value "DEVENV_WEB_PATH=$env:UserProfile\\www"
 docker network create devenv
 
 # run the application
-docker-compose up -d
+docker compose up -d

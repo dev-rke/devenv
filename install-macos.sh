@@ -22,4 +22,4 @@ EOT
 
 
 # run the application
-docker-compose up -d
+docker compose up -d
